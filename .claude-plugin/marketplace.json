@@ -4,19 +4,25 @@
     "name": "Andrian"
   },
   "metadata": {
-    "description": "Pug Claude Code plugins.",
+    "description": "Pug Claude Code plugins, skills, and agents.",
     "version": "1.0.0"
   },
   "plugins": [
     {
       "name": "pug-work-delegation",
-      "source": "./",
+      "source": "./plugins/pug-work-delegation",
       "description": "Delegation routing for Claude Code: a task-triggered skill that decides what is worth delegating and to which tier, plus three model-pinned agents (scout/haiku, executor/sonnet, deep-work/opus) that report bounded, auditable evidence.",
       "version": "1.0.0",
       "author": {
         "name": "Andrian"
       },
-      "keywords": ["delegation", "subagents", "model-routing", "context-management", "workflow"],
+      "keywords": [
+        "delegation",
+        "subagents",
+        "model-routing",
+        "context-management",
+        "workflow"
+      ],
       "category": "workflow"
     }
   ]

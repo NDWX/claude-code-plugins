@@ -1,48 +1,47 @@
-# Pug.AI.Generative.Agents.ClaudeCode.PlugIns.WorkDelegation
+# Pug.AI.Generative.Agents.ClaudeCode
 
-Delegation routing for Claude Code, packaged as the `pug-work-delegation` plugin.
+Claude Code plugins, skills, and agents for Pug. The repository is itself a plugin
+marketplace — `pug-claude-plugins` — so every plugin below installs from one source.
 
-## What it provides
+## Layout
 
-**Skill — `delegating-work`.** Task-triggered: fires when you ask to delegate, parallelize, fan out, or split work across subagents. It carries the routing rules, not a narrative — when delegating beats doing the work inline, when switching the session model beats delegating, how to brief a cold agent, and what evidence to demand back.
+```
+.claude-plugin/marketplace.json     # marketplace manifest; lists every plugin
+plugins/<plugin-name>/
+  .claude-plugin/plugin.json        # that plugin's own manifest
+  skills/<skill-name>/SKILL.md
+  agents/<agent-name>.md
+  hooks/hooks.json                  # optional
+  README.md
+```
 
-**Agents — three tiers, model-pinned in frontmatter.**
+## Plugins
 
-| Agent | Model | Role |
-|---|---|---|
-| `pug-work-delegation:scout` | haiku | Read-only evidence: locate files, map a code path, summarize a file or log, verify checklist items. Cites `file:line`; never edits, never decides direction. |
-| `pug-work-delegation:executor` | sonnet | Scoped implementation against a decided plan. Escalates rather than improvising on ambiguity, architecture, or high-risk areas. |
-| `pug-work-delegation:deep-work` | opus | Complex implementation, deep debugging, cross-module and security reasoning, reviewing cheaper agents' output. |
-
-`executor` and `deep-work` end every report with a bounded **DECISIONS** list — each unspecified choice on one line with the alternative rejected, no justification. `deep-work` adds `ASSUMED:` and `REVIEW:` lines. The list is an audit surface, deliberately a pointer rather than an explanation: follow up with `SendMessage` on the one line that looks wrong, rather than paying for rationale on everything up front.
-
-## Design notes
-
-Two levers, often conflated:
-
-- **`/model` controls what a turn costs.** It does not partition context — there is one transcript, and switching only changes which model reads it.
-- **Delegation controls what accumulates.** A subagent's tool calls stay in its own context; only its report comes back.
-
-So delegation is worth it in proportion to *(how expensive the current context is)* × *(how bulky the output would be)*. Both terms describe the window you are in now, not what ran in an earlier phase — which is why the same search is not worth delegating from a cheap session and clearly worth it from an expensive one.
-
-The plugin does not, and cannot, switch models for you. That stays a user action.
+| Plugin | What it does |
+|---|---|
+| [`pug-work-delegation`](plugins/pug-work-delegation) | Delegation routing: a task-triggered skill for deciding what to delegate and to which tier, plus three model-pinned agents (`scout`/haiku, `executor`/sonnet, `deep-work`/opus) that return bounded, auditable evidence. |
 
 ## Install
 
 ```
-/plugin marketplace add ~/dev/pug/Pug.AI.Generative.Agents.ClaudeCode.PlugIns.WorkDelegation
-/plugin install pug-work-delegation@pug-claude-plugins
+/plugin marketplace add ~/dev/pug/Pug.AI.Generative.Agents.ClaudeCode
+/plugin install <plugin-name>@pug-claude-plugins
 ```
 
-Once pushed, point the marketplace at the remote instead to sync across machines:
+Point the marketplace at the git remote instead to sync across machines:
 
 ```
 /plugin marketplace add <git-remote-url>
 ```
 
-## Naming
+## Adding a plugin
 
-The plugin is `pug-work-delegation`; the repo keeps the longer
-`Pug.AI.Generative.Agents.ClaudeCode.PlugIns.WorkDelegation` name. Claude Code namespaces
-plugin components by the plugin name, so agents resolve as `pug-work-delegation:scout` and so on.
-Kebab-case is required for Claude.ai marketplace sync, so keep it that way if that is ever wanted.
+1. Create `plugins/<plugin-name>/` with a `.claude-plugin/plugin.json` (`name`, `description`, `version`, `author`, `keywords`).
+2. Add `skills/`, `agents/`, and `hooks/` as needed.
+3. Add an entry to `.claude-plugin/marketplace.json` with `"source": "./plugins/<plugin-name>"`.
+4. Add a row to the table above.
+
+Keep plugin names kebab-case — lowercase letters, digits, and hyphens. Claude Code
+tolerates other forms, but Claude.ai marketplace sync rejects them. The name becomes the
+namespace prefix for that plugin's skills and agents (`<plugin-name>:<agent-name>`), so
+changing it later breaks every reference in that plugin's own skill files.
