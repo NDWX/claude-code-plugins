@@ -39,7 +39,8 @@ Point the marketplace at the git remote instead to sync across machines:
 1. Create `plugins/<plugin-name>/` with a `.claude-plugin/plugin.json` (`name`, `description`, `version`, `author`, `keywords`).
 2. Add `skills/`, `agents/`, and `hooks/` as needed.
 3. Add an entry to `.claude-plugin/marketplace.json` with `"source": "./plugins/<plugin-name>"`.
-4. Add a row to the table above.
+4. Add a `CLAUDE.md` in the plugin folder recording the constraints and rationale that the files themselves do not show.
+5. Add a row to the table above.
 
 Keep plugin names kebab-case — lowercase letters, digits, and hyphens. Claude Code
 tolerates other forms, but Claude.ai marketplace sync rejects them. The name becomes the
