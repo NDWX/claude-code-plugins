@@ -14,7 +14,7 @@ There is one conversation transcript. `/model` changes which model reads it; it 
 - To change **what a turn costs** → the user switches the session model. Only they can do that: recommend it, never assume it happened.
 - To change **what accumulates in this window** → delegate. A subagent's tool calls happen in its own context; only its report comes back.
 
-So when the whole remaining phase is execution and this window does not need protecting, recommend `/model sonnet` rather than spawning `pug.workDelegation:executor`. Reach for that agent when this context is expensive and must stay clean, or when independent parts should run at once.
+So when the whole remaining phase is execution and this window does not need protecting, recommend `/model sonnet` rather than spawning `pug-work-delegation:executor`. Reach for that agent when this context is expensive and must stay clean, or when independent parts should run at once.
 
 ## Decide whether to delegate at all
 
@@ -37,17 +37,17 @@ Do it directly when:
 
 | Work | Agent | Model |
 |---|---|---|
-| Find files, map a code path, summarize a file or log, verify a checklist item | `pug.workDelegation:scout` | haiku |
-| Scoped implementation, tests, local refactors, fixing a diagnosed failure | `pug.workDelegation:executor` | sonnet |
-| Complex implementation, deep debugging, cross-module or security reasoning, reviewing cheaper agents' work | `pug.workDelegation:deep-work` | opus |
+| Find files, map a code path, summarize a file or log, verify a checklist item | `pug-work-delegation:scout` | haiku |
+| Scoped implementation, tests, local refactors, fixing a diagnosed failure | `pug-work-delegation:executor` | sonnet |
+| Complex implementation, deep debugging, cross-module or security reasoning, reviewing cheaper agents' work | `pug-work-delegation:deep-work` | opus |
 
 ```
-Agent(subagent_type: "pug.workDelegation:scout", description: "...", prompt: "...")
+Agent(subagent_type: "pug-work-delegation:scout", description: "...", prompt: "...")
 ```
 
 Model comes from each agent's definition in this plugin's `agents/` directory, so it does not need restating per call. Pass `model:` only to deliberately override a tier for one call.
 
-These three names are always prefixed `pug.workDelegation:` when calling `Agent`. Below they are shortened to `scout`, `executor`, and `deep-work` for readability.
+These three names are always prefixed `pug-work-delegation:` when calling `Agent`. Below they are shortened to `scout`, `executor`, and `deep-work` for readability.
 
 Independent parts go in a single message so they run in parallel. Parts that feed each other must be sequential — do not spawn a dependent agent before its input exists.
 

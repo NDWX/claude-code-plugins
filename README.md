@@ -1,6 +1,6 @@
 # Pug.AI.Generative.Agents.ClaudeCode.PlugIns.WorkDelegation
 
-Delegation routing for Claude Code, packaged as the `pug.workDelegation` plugin.
+Delegation routing for Claude Code, packaged as the `pug-work-delegation` plugin.
 
 ## What it provides
 
@@ -10,9 +10,9 @@ Delegation routing for Claude Code, packaged as the `pug.workDelegation` plugin.
 
 | Agent | Model | Role |
 |---|---|---|
-| `pug.workDelegation:scout` | haiku | Read-only evidence: locate files, map a code path, summarize a file or log, verify checklist items. Cites `file:line`; never edits, never decides direction. |
-| `pug.workDelegation:executor` | sonnet | Scoped implementation against a decided plan. Escalates rather than improvising on ambiguity, architecture, or high-risk areas. |
-| `pug.workDelegation:deep-work` | opus | Complex implementation, deep debugging, cross-module and security reasoning, reviewing cheaper agents' output. |
+| `pug-work-delegation:scout` | haiku | Read-only evidence: locate files, map a code path, summarize a file or log, verify checklist items. Cites `file:line`; never edits, never decides direction. |
+| `pug-work-delegation:executor` | sonnet | Scoped implementation against a decided plan. Escalates rather than improvising on ambiguity, architecture, or high-risk areas. |
+| `pug-work-delegation:deep-work` | opus | Complex implementation, deep debugging, cross-module and security reasoning, reviewing cheaper agents' output. |
 
 `executor` and `deep-work` end every report with a bounded **DECISIONS** list — each unspecified choice on one line with the alternative rejected, no justification. `deep-work` adds `ASSUMED:` and `REVIEW:` lines. The list is an audit surface, deliberately a pointer rather than an explanation: follow up with `SendMessage` on the one line that looks wrong, rather than paying for rationale on everything up front.
 
@@ -31,7 +31,7 @@ The plugin does not, and cannot, switch models for you. That stays a user action
 
 ```
 /plugin marketplace add ~/dev/pug/Pug.AI.Generative.Agents.ClaudeCode.PlugIns.WorkDelegation
-/plugin install pug.workDelegation@pug-claude-plugins
+/plugin install pug-work-delegation@pug-claude-plugins
 ```
 
 Once pushed, point the marketplace at the remote instead to sync across machines:
@@ -40,6 +40,9 @@ Once pushed, point the marketplace at the remote instead to sync across machines
 /plugin marketplace add <git-remote-url>
 ```
 
-## Note on the plugin name
+## Naming
 
-`pug.workDelegation` is not kebab-case. Claude Code accepts it; Claude.ai marketplace sync requires lowercase letters, digits, and hyphens. Rename to `pug-work-delegation` in both manifests if that sync is ever wanted.
+The plugin is `pug-work-delegation`; the repo keeps the longer
+`Pug.AI.Generative.Agents.ClaudeCode.PlugIns.WorkDelegation` name. Claude Code namespaces
+plugin components by the plugin name, so agents resolve as `pug-work-delegation:scout` and so on.
+Kebab-case is required for Claude.ai marketplace sync, so keep it that way if that is ever wanted.

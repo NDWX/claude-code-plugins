@@ -1,5 +1,5 @@
 {
-  "name": "pug.workDelegation",
+  "name": "pug-work-delegation",
   "description": "Delegation routing for Claude Code: a task-triggered skill that decides what is worth delegating and to which tier, plus three model-pinned agents (scout/haiku, executor/sonnet, deep-work/opus) that report bounded, auditable evidence.",
   "version": "1.0.0",
   "author": {
