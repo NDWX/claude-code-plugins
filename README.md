@@ -26,7 +26,7 @@ plugins/<plugin-name>/
 ## Install
 
 ```
-/plugin marketplace add <owner>/pug-claude-code-plugins
+/plugin marketplace add <owner>/claude-code-plugins
 /plugin install <plugin-name>@pug-claude-plugins
 ```
 
