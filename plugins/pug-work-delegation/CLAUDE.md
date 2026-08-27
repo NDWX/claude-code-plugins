@@ -1,6 +1,7 @@
 # pug-work-delegation — development context
 
-Delegation routing for Claude Code: one task-triggered skill plus three model-pinned agents.
+Delegation routing for Claude Code: one command, one task-triggered skill, three model-pinned
+agents.
 This file records the constraints that are **not** recoverable from reading the files, and the
 mistakes that produced them. Read it before editing anything here.
 
@@ -8,6 +9,7 @@ mistakes that produced them. Read it before editing anything here.
 
 ```
 .claude-plugin/plugin.json          name/version/description; name is the namespace prefix
+commands/delegate.md                explicit entry point — defers to the skill, never restates it
 skills/delegating-work/SKILL.md     routing rules — loaded when the user asks to delegate
 agents/scout.md                     haiku · read-only evidence
 agents/executor.md                  sonnet · scoped implementation
@@ -47,10 +49,16 @@ specific defect in it:
    senior decision-maker." A skill cannot detect which model loaded it, so that text lies to
    whatever model reads it. Agent frontmatter (`model:`) is the only honest place to pin a model.
 
-3. **The skill must never instruct proactive delegation.** The harness carries a standing default
-   not to spawn agents unless the user asks. A skill telling the model to fan out on its own puts
-   it in direct conflict with that. This skill only fires *after* the user asks to delegate — it
-   supplies routing for a decision already made, and must stay that way.
+3. **Nothing here may instruct proactive delegation.** The harness carries a standing default not
+   to spawn agents unless the user asks. A skill telling the model to fan out on its own puts it in
+   direct conflict with that. The skill only fires *after* the user asks to delegate — it supplies
+   routing for a decision already made, and must stay that way. `commands/delegate.md` sets
+   `disable-model-invocation: true` for the same reason: it makes the command reachable only by the
+   user typing it, so the model cannot route itself into a fan-out. Do not remove that field.
+
+   The command carries no routing rules of its own — it invokes the skill and defers to it. Rules
+   duplicated across the two would drift, exactly as the skill and the agents' DECISIONS fields
+   already did once.
 
 4. **The skill carries conclusions, not reasoning.** Anything that does not change a choice at the
    moment it is read belongs in this file or the README, not in `SKILL.md`. The test for including
@@ -58,10 +66,13 @@ specific defect in it:
    rather than spawning `executor` when the window does not need protecting") earns its place; the
    argument behind it does not.
 
-5. **`scout` stays read-only.** Tools are `Read, Grep, Glob, Bash` with an explicit read-only
-   constraint in the body. It is the cheapest tier and reports facts only. Do not give it write
-   tools, and do not ask it to make or explain decisions — introspection is the weakest capability
-   of the cheapest model, and produces fluent, low-information text.
+5. **`scout` stays read-only.** Tools are `Read, Grep, Glob, Bash` plus the read-only ReSharper MCP
+   tools, with an explicit read-only constraint in the body. It is the cheapest tier and reports
+   facts only. Do not give it write tools, and do not ask it to make or explain decisions —
+   introspection is the weakest capability of the cheapest model, and produces fluent,
+   low-information text. Every MCP tool granted to any tier here is a navigation or diagnostic one;
+   `rename_symbol`, `apply_quick_fix`, `fix_usings`, `format_file`, and `generate_members` belong in
+   no `tools:` list in this plugin, least of all `scout`'s.
 
 6. **DECISIONS stays a bounded list, never a narrative.** `executor` and `deep-work` end reports
    with one line per unspecified choice plus the rejected alternative — no justification.
@@ -73,8 +84,10 @@ specific defect in it:
 
 ## Namespacing — the sharp edge
 
-The plugin name in `plugin.json` becomes the prefix for every skill and agent it ships:
-`pug-work-delegation:scout`, `pug-work-delegation:delegating-work`, and so on.
+The plugin name in `plugin.json` becomes the prefix for every component it ships:
+`pug-work-delegation:scout`, `pug-work-delegation:delegating-work`, and so on. The command is
+reached as `/delegate` while no other installed plugin claims that name, and as
+`/pug-work-delegation:delegate` when one does — so never document the bare form as guaranteed.
 
 **Renaming the plugin breaks every agent reference inside `SKILL.md`.** That has already happened
 twice in this repo's history. If the name changes, grep the whole plugin folder for the old name

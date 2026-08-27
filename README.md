@@ -1,4 +1,4 @@
-# Pug.AI.Generative.Agents.ClaudeCode
+# claude-code-plugins
 
 Claude Code plugins, skills, and agents for Pug. The repository is itself a plugin
 marketplace — `pug-claude-plugins` — so every plugin below installs from one source.
@@ -11,7 +11,9 @@ plugins/<plugin-name>/
   .claude-plugin/plugin.json        # that plugin's own manifest
   skills/<skill-name>/SKILL.md
   agents/<agent-name>.md
+  commands/<command-name>.md        # optional; slash commands
   hooks/hooks.json                  # optional
+  .mcp.json                         # optional; MCP servers bundled with the plugin
   README.md
 ```
 
@@ -19,20 +21,19 @@ plugins/<plugin-name>/
 
 | Plugin | What it does |
 |---|---|
-| [`pug-work-delegation`](plugins/pug-work-delegation) | Delegation routing: a task-triggered skill for deciding what to delegate and to which tier, plus three model-pinned agents (`scout`/haiku, `executor`/sonnet, `deep-work`/opus) that return bounded, auditable evidence. |
+| [`pug-work-delegation`](plugins/pug-work-delegation) | Delegation routing: a `/delegate` command and a task-triggered skill for deciding what to delegate and to which tier, plus three model-pinned agents (`scout`/haiku, `executor`/sonnet, `deep-work`/opus) that return bounded, auditable evidence. |
 
 ## Install
 
 ```
-/plugin marketplace add ~/dev/pug/Pug.AI.Generative.Agents.ClaudeCode
+/plugin marketplace add <owner>/claude-code-plugins
 /plugin install <plugin-name>@pug-claude-plugins
 ```
 
-Point the marketplace at the git remote instead to sync across machines:
-
-```
-/plugin marketplace add <git-remote-url>
-```
+The marketplace registers under its manifest name, `pug-claude-plugins`, which is what
+every install command references and what `/plugin marketplace list` shows. That name is
+independent of the repository and the owner, so both can change without breaking an
+install command.
 
 ## Adding a plugin
 

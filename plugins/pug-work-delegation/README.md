@@ -4,6 +4,8 @@ Delegation routing for Claude Code.
 
 ## What it provides
 
+**Command — `/delegate [what to delegate]`.** The explicit entry point: it applies the skill's routing to the task you name, states the split before spawning, and checks the evidence that comes back. It carries no rules of its own — it defers to the skill, so the two cannot drift. With no argument it delegates the work already under discussion. The command is deliberately not model-invocable: it runs only when you type it, so nothing here can decide to fan out on its own.
+
 **Skill — `delegating-work`.** Task-triggered: fires when you ask to delegate, parallelize, fan out, or split work across subagents. It carries the routing rules, not a narrative — when delegating beats doing the work inline, when switching the session model beats delegating, how to brief a cold agent, and what evidence to demand back.
 
 **Agents — three tiers, model-pinned in frontmatter.**
@@ -30,18 +32,13 @@ The plugin does not, and cannot, switch models for you. That stays a user action
 ## Install
 
 ```
-/plugin marketplace add ~/dev/pug/Pug.AI.Generative.Agents.ClaudeCode
+/plugin marketplace add <owner>/claude-code-plugins
 /plugin install pug-work-delegation@pug-claude-plugins
-```
-
-Once pushed, point the marketplace at the remote instead to sync across machines:
-
-```
-/plugin marketplace add <git-remote-url>
 ```
 
 ## Naming
 
 Claude Code namespaces plugin components by plugin name, so the agents resolve as
-`pug-work-delegation:scout`, `pug-work-delegation:executor`, and `pug-work-delegation:deep-work`.
+`pug-work-delegation:scout`, `pug-work-delegation:executor`, and `pug-work-delegation:deep-work`,
+and the command as `/pug-work-delegation:delegate` if another plugin also claims `/delegate`.
 Keep the plugin name kebab-case — Claude.ai marketplace sync requires it.
