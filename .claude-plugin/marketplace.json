@@ -24,6 +24,29 @@
         "workflow"
       ],
       "category": "workflow"
+    },
+    {
+      "name": "pug-sal",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/NDWX/Pug.Sal.git",
+        "path": "claude/pug-sal",
+        "ref": "sal-pre-v0.0.1"
+      },
+      "description": "Pug.Sal, the address reference-data service: writing its custom components (data-access driver, name normalizer, dataset importer, change event publisher), hosting it, and using its directory, validation and administration APIs. Versioned with the Pug.Sal packages.",
+      "version": "0.0.1",
+      "author": {
+        "name": "Andrian"
+      },
+      "keywords": [
+        "pug",
+        "sal",
+        "address",
+        "postcode",
+        "locality",
+        "dotnet"
+      ],
+      "category": "development"
     }
   ]
 }
