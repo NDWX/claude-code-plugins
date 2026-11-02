@@ -47,6 +47,31 @@
         "dotnet"
       ],
       "category": "development"
+    },
+    {
+      "name": "pug-sqetch",
+      "source": {
+        "source": "git-subdir",
+        "url": "https://github.com/NDWX/Pug.Sqetch.git",
+        "path": "claude/pug-sqetch",
+        "ref": "main"
+      },
+      "description": "Sqetch, the database schema upgrader for DevOps pipelines: installing sqetch and sqetch-deploy, mapping steps, plans and releases onto tasks and software releases, starting a project with its journaling SQL, bundling and deploying, CI pipelines, and getting help from the CLIs. Follows Pug.Sqetch's main branch, which is its latest release.",
+      "author": {
+        "name": "Andrian"
+      },
+      "keywords": [
+        "pug",
+        "sqetch",
+        "database",
+        "schema",
+        "migrations",
+        "devops",
+        "ci",
+        "postgresql",
+        "sqlite"
+      ],
+      "category": "development"
     }
   ]
 }

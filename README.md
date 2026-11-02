@@ -23,6 +23,7 @@ plugins/<plugin-name>/
 |---|---|
 | [`pug-work-delegation`](plugins/pug-work-delegation) | Delegation routing: a `/delegate` command and a task-triggered skill for deciding what to delegate and to which tier, plus three model-pinned agents (`scout`/haiku, `executor`/sonnet, `deep-work`/opus) that return bounded, auditable evidence. |
 | [`pug-sal`](https://github.com/NDWX/Pug.Sal/tree/develop/claude/pug-sal) | Skills for [Pug.Sal](https://github.com/NDWX/Pug.Sal): writing its custom components, hosting it, and using its directory, validation and administration APIs. Its source lives in the Pug.Sal repository (see below). |
+| [`pug-sqetch`](https://github.com/NDWX/Pug.Sqetch/tree/main/claude/pug-sqetch) | Skills for [Sqetch](https://github.com/NDWX/Pug.Sqetch), the database schema upgrader: installing it, mapping plans, steps and releases onto tasks and software releases, starting a project, bundling and deploying, CI, and getting help from the CLIs. Its source lives in the Pug.Sqetch repository and follows that repository's `main`, its latest release (see below). |
 
 ## Install
 
@@ -52,6 +53,10 @@ listed here with a `git-subdir` source pinned to a release tag, e.g. `pug-sal`:
 The entry's `version` and `ref` are updated after each release of that library, so the skills
 users install match the packages they reference. Steps 1, 2 and 4 above then happen in that
 repository, not here.
+
+A library whose `main` branch moves to each release can instead be listed with `"ref": "main"` and
+no `version`, e.g. `pug-sqetch`: the plugin's own `plugin.json` version decides updates, and nothing
+here changes per release.
 
 Keep plugin names kebab-case — lowercase letters, digits, and hyphens. Claude Code
 tolerates other forms, but Claude.ai marketplace sync rejects them. The name becomes the
