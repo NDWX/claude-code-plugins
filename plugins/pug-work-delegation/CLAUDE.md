@@ -11,9 +11,9 @@ mistakes that produced them. Read it before editing anything here.
 .claude-plugin/plugin.json          name/version/description; name is the namespace prefix
 commands/delegate.md                explicit entry point — defers to the skill, never restates it
 skills/delegating-work/SKILL.md     routing rules — loaded when the user asks to delegate
-agents/scout.md                     haiku · read-only evidence
-agents/executor.md                  sonnet · scoped implementation
-agents/deep-work.md                 opus  · hard technical work + review
+agents/scout.md                     haiku  · medium · read-only evidence
+agents/executor.md                  sonnet · medium · scoped implementation
+agents/deep-work.md                 opus   · high   · hard technical work + review
 README.md                           user-facing: what it does, install, design summary
 ```
 
@@ -31,10 +31,15 @@ Corollary, and the plugin's central rule: delegation is worth it in proportion t
 *(how expensive the current context is)* × *(how bulky the output would be)*. Both terms describe
 the window you are in right now — not what ran in an earlier phase, and not which model is active.
 
-**Delegation is not a cost control.** A subagent starts cold and re-derives context, so for work
-the parent could do in a couple of tool calls, delegating costs more. If a change to this plugin
-is motivated by "save money on cheap tasks", it is aimed at the wrong lever — that is `/model`,
-which is a user action this plugin cannot perform and must never pretend to.
+**Delegation is not a cost control — except for reading.** A subagent starts cold and re-derives
+context, so for work the parent could do in a couple of tool calls, delegating costs more. That
+holds for `executor` and `deep-work`, whose models cost a large share of what the parent costs. It
+does not hold for bulk reading routed to `scout`: Haiku 5.5 input is about 1/40th of Opus 5.5's and
+1/80th of Fable 5.2's (list prices as of 2026-11), so its cold start is cheap next to the parent
+reading the same files. Outside that case, a change motivated by "save money on cheap tasks" is
+aimed at the wrong lever — that is `/model`, which is a user action this plugin cannot perform and
+must never pretend to. Re-check the price ratios when a new model generation ships; this exception
+did not exist when Haiku cost a fifth of Opus.
 
 ## Invariants — breaking these is how the previous version failed
 
@@ -104,9 +109,16 @@ rejects them outright.
 
 - **Version lives in two places**: `plugin.json` and the repo's `.claude-plugin/marketplace.json`
   entry. Bump both together or they drift.
-- **Agent frontmatter fields**: `name`, `description`, `tools`, `model`. Omit `tools` to inherit
-  everything (`deep-work` does). The `description` is what the parent matches against when routing,
-  so it must describe the *work*, not the agent's rank.
+- **Agent frontmatter fields**: `name`, `description`, `tools`, `model`, `effort`. Omit `tools` to
+  inherit everything (`deep-work` does, which includes starting its own subagents; an entry like
+  `Agent(name, ...)` in a `tools` list restricts which ones). The `description` is what the parent
+  matches against when routing, so it must describe the *work*, not the agent's rank.
+- **Every agent pins `effort`.** Defaults differ by model — Haiku 5.5 and Opus 5.5 default to
+  `medium`, Sonnet 5.5 and Fable 5.2 to `high` — and it is unconfirmed whether an agent without the
+  field inherits the session's effort. If it does, a high session effort makes Haiku think at length
+  and occasionally end with an empty reply. On current models effort, not prompt text, controls how
+  much they think: do not put "reason thoroughly" or "don't overthink" lines in agent bodies
+  (`deep-work` had one; it was removed in 1.2.0 for this reason).
 - **After editing, reinstall to test.** Plugin content is read from the marketplace cache, not
   from this working copy, so edits here are not live until reinstalled. Verify by checking that
   the agent roster lists `pug-work-delegation:*` with the intended tools.
@@ -120,3 +132,10 @@ rejects them outright.
 - Additional tiers. Three is enough, and `deep-work` is already the narrowest — its honest uses are
   isolating a hard sub-problem from an expensive window, and getting an independent model's read on
   risky code.
+- A Fable agent. Fable 5.2 belongs in two places: as the *session* model that plans and
+  orchestrates (the README recommends this pairing), and as a per-call `model: "fable"` escalation
+  on `deep-work` (the skill names when). A pinned agent is wrong for it: Anthropic positions Opus 5.5
+  as the default and Fable for when Opus at higher effort still falls short; Fable costs twice
+  Opus; it has its own, lower rate limits, which parallel fan-out hits first; and it requires
+  30-day data retention, so it fails in a zero-data-retention organization. Revisit if those facts
+  change.

@@ -5,7 +5,7 @@ description: Use when the user asks to delegate, parallelize, fan out, or split 
 
 # Delegating work across agents
 
-Delegation buys two things: **parallelism**, and **keeping bulky tool output out of this context**. It does not buy cheaper reasoning — every spawn starts cold and re-derives context, so a task that costs less than its own briefing should just be done directly here.
+Delegation buys two things: **parallelism**, and **keeping bulky tool output out of this context**. It does not buy cheaper reasoning — a named agent starts cold and re-derives context, so a task that costs less than its own briefing should just be done directly here. Reading is the exception: `scout` reads at a small fraction of what this session pays when it runs on Opus or Fable, so bulk reading routed to it is cheaper as well as cleaner.
 
 ## Delegating and switching models are different tools
 
@@ -35,17 +35,19 @@ Do it directly when:
 
 ## Route to the cheapest tier that can do it well
 
-| Work | Agent | Model |
+| Work | Agent | Model · effort |
 |---|---|---|
-| Find files, map a code path, summarize a file or log, verify a checklist item | `pug-work-delegation:scout` | haiku |
-| Scoped implementation, tests, local refactors, fixing a diagnosed failure | `pug-work-delegation:executor` | sonnet |
-| Complex implementation, deep debugging, cross-module or security reasoning, reviewing cheaper agents' work | `pug-work-delegation:deep-work` | opus |
+| Find files, map a code path, summarize a file or log, verify a checklist item | `pug-work-delegation:scout` | haiku · medium |
+| Scoped implementation, tests, local refactors, fixing a diagnosed failure | `pug-work-delegation:executor` | sonnet · medium |
+| Complex implementation, deep debugging, cross-module or security reasoning, reviewing cheaper agents' work | `pug-work-delegation:deep-work` | opus · high |
 
 ```
 Agent(subagent_type: "pug-work-delegation:scout", description: "...", prompt: "...")
 ```
 
-Model comes from each agent's definition in this plugin's `agents/` directory, so it does not need restating per call. Pass `model:` only to deliberately override a tier for one call.
+Model and effort come from each agent's definition in this plugin's `agents/` directory, so they do not need restating per call. Pass `model:` only to deliberately override a tier for one call. The one planned override is `model: "fable"` on `deep-work`, when an attempt on its default model fell short or the work is a long unattended change across several modules. Never use Fable for fan-out or for `scout` or `executor` work.
+
+A `fork` (`subagent_type: "fork"`) inherits this whole conversation, so it needs no briefing and still keeps its tool output out of this context — but it always runs on the session model. Use it when briefing a cold agent would cost more than the work itself, never to save money.
 
 These three names are always prefixed `pug-work-delegation:` when calling `Agent`. Below they are shortened to `scout`, `executor`, and `deep-work` for readability.
 
@@ -53,7 +55,7 @@ Independent parts go in a single message so they run in parallel. Parts that fee
 
 ## Brief them properly
 
-Each agent starts cold: it has none of this conversation. A vague prompt is the main reason delegation produces junk that costs more to check than to have done yourself.
+Each of the three agents starts cold: it has none of this conversation. A vague prompt is the main reason delegation produces junk that costs more to check than to have done yourself.
 
 Give every agent:
 

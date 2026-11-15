@@ -8,13 +8,13 @@ Delegation routing for Claude Code.
 
 **Skill — `delegating-work`.** Task-triggered: fires when you ask to delegate, parallelize, fan out, or split work across subagents. It carries the routing rules, not a narrative — when delegating beats doing the work inline, when switching the session model beats delegating, how to brief a cold agent, and what evidence to demand back.
 
-**Agents — three tiers, model-pinned in frontmatter.**
+**Agents — three tiers, model and effort pinned in frontmatter.**
 
-| Agent | Model | Role |
-|---|---|---|
-| `pug-work-delegation:scout` | haiku | Read-only evidence: locate files, map a code path, summarize a file or log, verify checklist items. Cites `file:line`; never edits, never decides direction. |
-| `pug-work-delegation:executor` | sonnet | Scoped implementation against a decided plan. Escalates rather than improvising on ambiguity, architecture, or high-risk areas. |
-| `pug-work-delegation:deep-work` | opus | Complex implementation, deep debugging, cross-module and security reasoning, reviewing cheaper agents' output. |
+| Agent | Model | Effort | Role |
+|---|---|---|---|
+| `pug-work-delegation:scout` | haiku | medium | Read-only evidence: locate files, map a code path, summarize a file or log, verify checklist items. Cites `file:line`; never edits, never decides direction. |
+| `pug-work-delegation:executor` | sonnet | medium | Scoped implementation against a decided plan. Escalates rather than improvising on ambiguity, architecture, or high-risk areas. |
+| `pug-work-delegation:deep-work` | opus | high | Complex implementation, deep debugging, cross-module and security reasoning, reviewing cheaper agents' output. Can be escalated to Fable for one call when Opus falls short. |
 
 `executor` and `deep-work` end every report with a bounded **DECISIONS** list — each unspecified choice on one line with the alternative rejected, no justification. `deep-work` adds `ASSUMED:` and `REVIEW:` lines. The list is an audit surface, deliberately a pointer rather than an explanation: follow up with `SendMessage` on the one line that looks wrong, rather than paying for rationale on everything up front.
 
@@ -27,7 +27,17 @@ Two levers, often conflated:
 
 So delegation is worth it in proportion to *(how expensive the current context is)* × *(how bulky the output would be)*. Both terms describe the window you are in now, not what ran in an earlier phase — which is why the same search is not worth delegating from a cheap session and clearly worth it from an expensive one.
 
+Delegation is mostly not a way to save money: every agent starts cold and re-derives context. Reading is the exception. `scout` runs on Haiku, whose input costs a small fraction of Opus or Fable, so routing bulk reading to it saves money as well as context.
+
 The plugin does not, and cannot, switch models for you. That stays a user action.
+
+### Recommended pairing
+
+Run the planning and decision phase on Fable (or Opus): requirements, specification, design, and the judgment calls the skill keeps in the session. Let the three agents do the bulk. Even while planning, send heavy code reading to `scout` so it stays out of the expensive context.
+
+At the end of planning, have the session write the plan to a file. That file keeps the decisions when you later switch with `/model` (Opus and Sonnet cannot read Fable's thinking, only its visible text), makes agent briefs short ("implement section 3 of `docs/plan.md`"), and lets execution start in a fresh session on a cheaper model.
+
+Fable needs 30-day data retention and has its own, lower rate limits, so it does not suit zero-data-retention organizations or heavy parallel fan-out.
 
 ## Install
 
